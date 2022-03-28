@@ -20,6 +20,12 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
+exports.selectUsers = () => {
+  return db.query("SELECT username FROM users").then((result) => {
+    return result.rows;
+  });
+};
+
 exports.changeArticleById = (article_id, updatedArticle) => {
   const { inc_votes } = updatedArticle;
   return db

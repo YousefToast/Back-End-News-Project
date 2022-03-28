@@ -70,69 +70,90 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
-describe("PATCH /api/articles/:article_id", () => {
-  const updateArticleInc = {
-    inc_votes: 6,
-  };
-  const updateArticleDec = {
-    inc_votes: -30,
-  };
-
-  test("Status:201, responds with the updated article page with new vote count when increasing.", () => {
+describe("GET /api/users", () => {
+  test("Status: 200, responds with an array of objects containing all the users.", () => {
     return request(app)
-      .patch("/api/articles/1")
-      .send(updateArticleInc)
-      .expect(201)
+      .get("/api/users")
+      .expect(200)
       .then((res) => {
-        expect(res.body.article).toEqual({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: timeDate(1594329060000),
-          votes: 106,
+        expect(res.body.users).toBeInstanceOf(Array);
+        expect(res.body.users).toHaveLength(4);
+        res.body.users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+            })
+          );
         });
       });
   });
 
-  test("Status:201, responds with the updated article page with new vote count when decreasing.", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send(updateArticleDec)
-      .expect(201)
-      .then((res) => {
-        expect(res.body.article).toEqual({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: timeDate(1594329060000),
-          votes: 70,
+  describe("PATCH /api/articles/:article_id", () => {
+    const updateArticleInc = {
+      inc_votes: 6,
+    };
+    const updateArticleDec = {
+      inc_votes: -30,
+    };
+
+    test("Status:201, responds with the updated article page with new vote count when increasing.", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send(updateArticleInc)
+        .expect(201)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: timeDate(1594329060000),
+            votes: 106,
+          });
         });
-      });
-  });
+    });
 
-  test("Status:404, sends an error when passed a non existent api request", () => {
-    return request(app)
-      .patch("/api/articles/360")
-      .send(updateArticleInc)
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("Article does not exist for article id: 360");
-      });
-  });
+    test("Status:201, responds with the updated article page with new vote count when decreasing.", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send(updateArticleDec)
+        .expect(201)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: timeDate(1594329060000),
+            votes: 70,
+          });
+        });
+    });
 
-  test("Status:400, sends an error when passing an invalid data type for votes.", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({
-        inc_votes: "PailShrelington",
-      })
-      .expect(400)
-      .then((res) => {
-        expect(res.body.msg).toBe("Invalid Input!");
-      });
+    test("Status:404, sends an error when passed a non existent api request", () => {
+      return request(app)
+        .patch("/api/articles/360")
+        .send(updateArticleInc)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe(
+            "Article does not exist for article id: 360"
+          );
+        });
+    });
+
+    test("Status:400, sends an error when passing an invalid data type for votes.", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({
+          inc_votes: "PailShrelington",
+        })
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Invalid Input!");
+        });
+    });
   });
 });
