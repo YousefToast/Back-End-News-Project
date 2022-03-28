@@ -30,23 +30,24 @@ describe("GET /api/topics", () => {
 
 describe("GET /api/articles/:article_id", () => {
   test("Status:200, responds with object of specified article", () => {
+    const articleObject = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: JSON.stringify(new Date(1594329060000 - hour)).slice(
+        //not an ideal solution to just take off an hour but the best i could do at the moment
+        1,
+        -1
+      ),
+      votes: 100,
+    };
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then((res) => {
-        expect(res.body.article).toEqual({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: JSON.stringify(new Date(1594329060000 - hour)).slice(
-            //not an ideal solution to just take off an hour but the best i could do at the moment
-            1,
-            -1
-          ),
-          votes: 100,
-        });
+        expect(res.body.article).toEqual(articleObject);
       });
   });
 
