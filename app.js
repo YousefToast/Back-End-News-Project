@@ -1,5 +1,9 @@
 const express = require("express");
-const { getTopics, getArticlesById } = require("./controllers/app.controllers");
+const {
+  getTopics,
+  getArticlesById,
+  patchArticlesById,
+} = require("./controllers/app.controllers");
 
 const app = express();
 app.use(express.json());
@@ -7,6 +11,8 @@ app.use(express.json());
 app.get("/api/topics", getTopics);
 
 app.get("/api/articles/:article_id", getArticlesById);
+
+app.patch("/api/articles/:article_id", patchArticlesById);
 
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {
