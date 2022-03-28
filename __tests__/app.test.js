@@ -7,6 +7,9 @@ const app = require("../app");
 beforeAll(() => seed(testData));
 afterAll(() => db.end());
 const hour = 3600000;
+const timeDate = function (num) {
+  return JSON.stringify(new Date(num - hour)).slice(1, -1);
+};
 
 describe("GET /api/topics", () => {
   test("Status:200, responds with an array of objects", () => {
@@ -36,11 +39,8 @@ describe("GET /api/articles/:article_id", () => {
       topic: "mitch",
       author: "butter_bridge",
       body: "I find this existence challenging",
-      created_at: JSON.stringify(new Date(1594329060000 - hour)).slice(
-        //not an ideal solution to just take off an hour but the best i could do at the moment
-        1,
-        -1
-      ),
+      created_at: timeDate(1594329060000),
+      //not an ideal solution to just take off an hour but the best i could do at the moment
       votes: 100,
     };
     return request(app)
