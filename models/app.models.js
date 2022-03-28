@@ -13,7 +13,7 @@ exports.selectArticleById = (article_id) => {
       if (result.rows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article does not exist for article id: ${article_id}`,
+          msg: `Article ${article_id} does not exist`,
         });
       }
       return result.rows[0];
@@ -26,7 +26,7 @@ exports.selectUsers = () => {
   });
 };
 
-exports.changeArticleById = (article_id, updatedArticle) => {
+exports.updateArticleById = (article_id, updatedArticle) => {
   const { inc_votes } = updatedArticle;
   return db
     .query(
@@ -37,7 +37,7 @@ exports.changeArticleById = (article_id, updatedArticle) => {
       if (result.rows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article does not exist for article id: ${article_id}`,
+          msg: `Article ${article_id} does not exist`,
         });
       }
       return result.rows[0];
