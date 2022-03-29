@@ -32,22 +32,23 @@ describe("GET /api/topics", () => {
 });
 
 describe("GET /api/articles/:article_id", () => {
-  test("Status:200, responds with object of specified article", () => {
-    const articleObject = {
-      article_id: 1,
-      title: "Living in the shadow of a great man",
-      topic: "mitch",
-      author: "butter_bridge",
-      body: "I find this existence challenging",
-      created_at: timeDate(1594329060000),
-      //not an ideal solution to just take off an hour but the best i could do at the moment
-      votes: 100,
-    };
+  const getArticleObject = {
+    article_id: 1,
+    title: "Living in the shadow of a great man",
+    topic: "mitch",
+    author: "butter_bridge",
+    body: "I find this existence challenging",
+    created_at: timeDate(1594329060000),
+    votes: 100,
+    comment_count: "11",
+  };
+
+  test("Status:200, responds with object of the chosen article including the comments.", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then((res) => {
-        expect(res.body.article).toEqual(articleObject);
+        expect(res.body.article).toEqual(getArticleObject);
       });
   });
 
