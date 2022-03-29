@@ -278,3 +278,18 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("GET /api", () => {
+  test("status:200, respond with information about the api endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(Object.keys(res.body.endpoints)).toEqual([
+          "GET /api",
+          "GET /api/topics",
+          "GET /api/articles",
+        ]);
+      });
+  });
+});
