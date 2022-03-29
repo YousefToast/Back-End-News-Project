@@ -43,3 +43,9 @@ exports.updateArticleById = (article_id, updatedArticle) => {
       return result.rows[0];
     });
 };
+
+exports.selectArticles = () => {
+  return db.query("SELECT * FROM articles").then((result) => {
+    return result.rows;
+  });
+};
