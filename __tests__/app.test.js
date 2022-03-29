@@ -278,3 +278,27 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("Status:204, responds with no content once it has been deleted.", () => {
+    return request(app).delete("/api/comments/5").expect(204);
+  });
+
+  test("Status:404, responds with error no comment found to be deleted", () => {
+    return request(app)
+      .delete("/api/comments/4252")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Comment 4252 does not exist!");
+      });
+  });
+
+  test("Status:404, responds with error no comment found to be deleted", () => {
+    return request(app)
+      .delete("/api/comments/ShrelComment")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+});
