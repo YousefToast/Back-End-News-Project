@@ -68,3 +68,21 @@ exports.selectArticles = () => {
     return result.rows;
   });
 };
+
+exports.createComment = (comment, article_id) => {
+  const { username, body } = comment;
+  if (username === undefined || body === undefined) {
+    return Promise.reject({
+      status: 400,
+      msg: "No content found",
+    });
+  }
+  return db
+    .query(
+      "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;",
+      [username, body, article_id]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

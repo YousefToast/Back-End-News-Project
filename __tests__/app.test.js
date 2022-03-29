@@ -10,6 +10,7 @@ const hour = 3600000;
 const timeDate = function (num) {
   return JSON.stringify(new Date(num - hour)).slice(1, -1);
 };
+const timeNow = Date.now();
 
 describe("GET /api/topics", () => {
   test("Status:200, responds with an array of objects", () => {
@@ -228,6 +229,52 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  const commentObject = {
+    username: "icellusedkars",
+    body: "All praise Shrel!",
+  };
+  test("Status:201, responds with object of posted comment", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ ...commentObject, article_id: 2 })
+      .expect(201)
+      .then((res) => {
+        expect(Date.parse(res.body.comment.created_at)).toBeGreaterThan(
+          timeNow
+        );
+        delete res.body.comment.created_at;
+        expect(res.body.comment).toEqual({
+          comment_id: 19,
+          article_id: 2,
+          author: "icellusedkars",
+          body: "All praise Shrel!",
+          votes: 0,
+        });
+      });
+  });
+
+  test("Status:400, responds with error when there is no body.", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ author: "icellusedkars" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("No content found");
+      });
+  });
+
+  test("Status:404, responds with error when invalid id is passed", () => {
+    return request(app)
+      .post("/api/articles/47832/comments")
+      .send(commentObject)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article does not exist");
       });
   });
 });
