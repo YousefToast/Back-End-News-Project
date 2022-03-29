@@ -3,6 +3,7 @@ const {
   selectArticleById,
   selectUsers,
   updateArticleById,
+  selectArticles,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -33,6 +34,14 @@ exports.patchArticleById = (req, res, next) => {
   updateArticleById(article_id, req.body)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.getArticles = (req, res, next) => {
+  selectArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch(next);
 };
