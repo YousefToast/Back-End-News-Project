@@ -3,6 +3,7 @@ const {
   selectArticleById,
   selectUsers,
   updateArticleById,
+  selectArticleComments,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -33,6 +34,19 @@ exports.patchArticleById = (req, res, next) => {
   updateArticleById(article_id, req.body)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.getComments = (req, res, next) => {
+  const { article_id } = req.params;
+  const promises = [selectArticleComments(article_id)];
+  if (article_id) promises.push(selectArticleById(article_id));
+
+  Promise.all(promises)
+    .then((results) => {
+      const comments = results[0];
+      res.status(200).send({ comments });
     })
     .catch(next);
 };

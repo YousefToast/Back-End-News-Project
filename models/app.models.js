@@ -43,3 +43,15 @@ exports.updateArticleById = (article_id, updatedArticle) => {
       return result.rows[0];
     });
 };
+
+exports.selectArticleComments = (article_id) => {
+  return db
+    .query(
+      "SELECT comments.comment_id, comments.body, comments.votes, comments.author, comments.created_at FROM comments \
+      WHERE comments.article_id = $1;",
+      [article_id]
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
