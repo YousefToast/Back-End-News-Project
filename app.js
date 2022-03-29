@@ -4,6 +4,7 @@ const {
   getArticleById,
   patchArticleById,
   getUsers,
+  getComments,
   getArticles,
 } = require("./controllers/app.controllers");
 
@@ -17,6 +18,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/users", getUsers);
 
 app.patch("/api/articles/:article_id", patchArticleById);
+
+app.get("/api/articles/:article_id/comments", getComments);
 
 app.get("/api/articles", getArticles);
 

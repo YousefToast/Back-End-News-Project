@@ -181,3 +181,53 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("Status:200, responds with an array of comments from a specific article.", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comments).toBeInstanceOf(Array);
+        expect(res.body.comments).toHaveLength(11);
+        res.body.comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              created_at: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+
+  test("Status:200, responds with an empty array when there are no comments on the article.", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comments).toEqual([]);
+      });
+  });
+
+  test("Status:404, responds with error when article id is not found", () => {
+    return request(app)
+      .get("/api/articles/1047/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article 1047 does not exist");
+      });
+  });
+
+  test("Status:400, responds with error when data input is incorrect", () => {
+    return request(app)
+      .get("/api/articles/shrel/comments")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+});
