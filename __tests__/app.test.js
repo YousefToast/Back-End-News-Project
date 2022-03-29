@@ -181,6 +181,55 @@ describe("GET /api/articles", () => {
         });
       });
   });
+
+  test("Status:200, responds with array of article objects in sort_by and order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  test("Status:200, responds with array of article objects filtered by a topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((res) => {
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+
+  test("Status:404, responds with an error when topic is not valid filter", () => {
+    return request(app)
+      .get("/api/articles?topic=shrella")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("topic does not exist");
+      });
+  });
+
+  test("Status:400, responds with error message when passed bad sort by request", () => {
+    return request(app)
+      .get("/api/articles?sort_by=pailShrelington")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Sort Query!");
+      });
+  });
+
+  test("Status:400, responds with error message when passed bad order request", () => {
+    return request(app)
+      .get("/api/articles?order=Ajdabiya")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Order Query!");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
