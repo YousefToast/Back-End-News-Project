@@ -5,6 +5,7 @@ const {
   patchArticleById,
   getUsers,
   getComments,
+  getArticles,
 } = require("./controllers/app.controllers");
 
 const app = express();
@@ -19,6 +20,8 @@ app.get("/api/users", getUsers);
 app.patch("/api/articles/:article_id", patchArticleById);
 
 app.get("/api/articles/:article_id/comments", getComments);
+
+app.get("/api/articles", getArticles);
 
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {

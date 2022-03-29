@@ -4,6 +4,7 @@ const {
   selectUsers,
   updateArticleById,
   selectArticleComments,
+  selectArticles,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -47,6 +48,14 @@ exports.getComments = (req, res, next) => {
     .then((results) => {
       const comments = results[0];
       res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.getArticles = (req, res, next) => {
+  selectArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch(next);
 };
