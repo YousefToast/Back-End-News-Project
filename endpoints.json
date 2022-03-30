@@ -9,9 +9,74 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/articles/:article_id": {
+    "description": "serves an object of a specific article",
+    "queries": [],
+    "exampleRequest": "article_id",
+    "exampleResponse": {
+      "article": {
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": 1594329060000,
+        "votes": 100
+      }
+    }
+  },
+
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "rogersop",
+          "name": "paul",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "serves an updated votes and body content. Responds with the updated article",
+    "queries": [],
+    "exampleRequest": "article_id",
+    "exampleOfTheBodySent": {
+      "inc_votes": 5,
+      "edit_body": "Something I wrote "
+    },
+    "exampleResponse": {
+      "articles": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "icellusedkars",
+        "body": "Something I wrote",
+        "votes": 5,
+        "article_id": 2,
+        "created_at": 1527695953341
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of objects containing all comments pertaining to specific article",
+    "queries": [],
+    "exampleRequest": "article_id",
+    "exampleResponse": {
+      "comments": [
+        {
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          "votes": 14,
+          "author": "butter_bridge",
+          "article_id": 1,
+          "created_at": 1604113380000
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
@@ -23,5 +88,29 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves an object whih has had a comment added to an article. Responds with that comment",
+    "queries": [],
+    "exampleRequest": "article_id",
+    "exampleOfBodySent": {
+      "body": "Shrel our saviour",
+      "username": "icellusedkars"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "article_id": 3,
+        "author": "icellusedkars",
+        "votes": 0,
+        "body": "Shrel our saviour",
+        "created_at": 1527695953341
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves an empty response when a comment has been deleted",
+    "exampleRequest": "comment_id",
+    "queries": []
   }
 }
