@@ -364,7 +364,15 @@ describe("POST /api/articles/:article_id/comments", () => {
 
 describe("DELETE /api/comments/:comment_id", () => {
   test("Status:204, responds with no content once it has been deleted.", () => {
-    return request(app).delete("/api/comments/5").expect(204);
+    return request(app)
+      .delete("/api/comments/5")
+      .expect(204)
+      .then(() => {
+        return db.query("SELECT * FROM comments WHERE comment_id = 5");
+      })
+      .then((res) => {
+        expect(res.rows).toEqual([]);
+      });
   });
 
   test("Status:404, responds with error no comment found to be deleted", () => {
