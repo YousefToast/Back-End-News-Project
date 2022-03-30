@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("../app");
+const JSONendpoints = require("../endpoints.json");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -390,6 +391,17 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("status:200, respond with information about the api endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual(JSONendpoints);
       });
   });
 });
