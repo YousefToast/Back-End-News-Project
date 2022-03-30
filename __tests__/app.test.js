@@ -204,6 +204,15 @@ describe("GET /api/articles", () => {
       });
   });
 
+  test("Status:200, responds with array of article objects when sorted and filtered by acceptable parameters.", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+
   test("Status:404, responds with an error when topic is not valid filter", () => {
     return request(app)
       .get("/api/articles?topic=shrella")
