@@ -204,12 +204,37 @@ describe("GET /api/articles", () => {
       });
   });
 
-  test("Status:200, responds with array of article objects when sorted and filtered by acceptable parameters.", () => {
+  test("Status:200, responds with array of article objects when sorted by acceptable parameters.", () => {
     return request(app)
       .get("/api/articles?sort_by=votes")
       .expect(200)
       .then((res) => {
         expect(res.body.articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+
+  test("Status:200, responds with array of article objects sorted in specific order.", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          ascending: true,
+        });
+      });
+  });
+
+  test("Status:200, responds with array of article objects when sorted and filtered by acceptable parameters", () => {
+    return request(app)
+      .get("/api/articles?order=asc&sort_by=votes&topic=mitch")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("votes", {
+          ascending: true,
+        });
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
       });
   });
 
