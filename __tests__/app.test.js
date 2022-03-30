@@ -388,25 +388,6 @@ describe("DELETE /api/comments/:comment_id", () => {
 });
 
 describe("GET /api", () => {
-  test("status:200, respond with titles of the api endpoints", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then((res) => {
-        expect(Object.keys(res.body)).toEqual([
-          "GET /api",
-          "GET /api/topics",
-          "GET /api/articles/:article_id",
-          "GET /api/users",
-          "PATCH /api/articles/:article_id",
-          "GET /api/articles/:article_id/comments",
-          "GET /api/articles",
-          "POST /api/articles/:article_id/comments",
-          "DELETE /api/comments/:comment_id",
-        ]);
-      });
-  });
-
   test("status:200, respond with information about the api endpoints", () => {
     return request(app)
       .get("/api")
