@@ -6,6 +6,7 @@ const {
   selectArticleComments,
   selectArticles,
   createComment,
+  removeComment,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -54,7 +55,8 @@ exports.getComments = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  selectArticles()
+  const { sort_by, order, topic } = req.query;
+  selectArticles(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -66,6 +68,15 @@ exports.postComment = (req, res, next) => {
   createComment(req.body, article_id)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then((comment) => {
+      res.status(204).send({ comment });
     })
     .catch(next);
 };

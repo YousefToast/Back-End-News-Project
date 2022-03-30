@@ -181,6 +181,89 @@ describe("GET /api/articles", () => {
         });
       });
   });
+
+  test("Status:200, responds with array of article objects in sort_by and order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  test("Status:200, responds with array of article objects filtered by a topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((res) => {
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+
+  test("Status:200, responds with array of article objects when sorted by acceptable parameters.", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+
+  test("Status:200, responds with array of article objects sorted in specific order.", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          ascending: true,
+        });
+      });
+  });
+
+  test("Status:200, responds with array of article objects when sorted and filtered by acceptable parameters", () => {
+    return request(app)
+      .get("/api/articles?order=asc&sort_by=votes&topic=mitch")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeSortedBy("votes", {
+          ascending: true,
+        });
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+
+  test("Status:404, responds with an error when topic is not valid filter", () => {
+    return request(app)
+      .get("/api/articles?topic=shrella")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("topic does not exist");
+      });
+  });
+
+  test("Status:400, responds with error message when passed bad sort by request", () => {
+    return request(app)
+      .get("/api/articles?sort_by=pailShrelington")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Sort Query!");
+      });
+  });
+
+  test("Status:400, responds with error message when passed bad order request", () => {
+    return request(app)
+      .get("/api/articles?order=Ajdabiya")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Order Query!");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -275,6 +358,30 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("Article does not exist");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("Status:204, responds with no content once it has been deleted.", () => {
+    return request(app).delete("/api/comments/5").expect(204);
+  });
+
+  test("Status:404, responds with error no comment found to be deleted", () => {
+    return request(app)
+      .delete("/api/comments/4252")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Comment 4252 does not exist!");
+      });
+  });
+
+  test("Status:404, responds with error no comment found to be deleted", () => {
+    return request(app)
+      .delete("/api/comments/ShrelComment")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Input!");
       });
   });
 });

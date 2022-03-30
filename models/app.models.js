@@ -63,8 +63,28 @@ exports.selectArticleComments = (article_id) => {
     });
 };
 
-exports.selectArticles = () => {
-  return db.query("SELECT * FROM articles").then((result) => {
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+  if (!["created_at", "votes", "author"].includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid Sort Query!" });
+  }
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid Order Query!" });
+  }
+  let queryValues = [];
+  let searchStr = "";
+  if (topic !== undefined) {
+    searchStr = " WHERE articles.topic = $1";
+    queryValues.push(topic);
+  }
+
+  let queryStr = `SELECT * FROM articles 
+  ${searchStr} 
+  ORDER BY ${sort_by} ${order};`;
+
+  return db.query(queryStr, queryValues).then((result) => {
+    if (result.rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "topic does not exist" });
+    }
     return result.rows;
   });
 };
@@ -84,5 +104,21 @@ exports.createComment = (comment, article_id) => {
     )
     .then((result) => {
       return result.rows[0];
+    });
+};
+
+exports.removeComment = (comment_id) => {
+  return db
+    .query("DELETE FROM comments WHERE comment_id = $1 RETURNING *;", [
+      comment_id,
+    ])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Comment ${comment_id} does not exist!`,
+        });
+      }
+      return result.rows;
     });
 };
