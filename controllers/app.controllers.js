@@ -8,6 +8,7 @@ const {
   createComment,
   removeComment,
   findUsername,
+  updateCommentVotes,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -87,6 +88,15 @@ exports.getUserByUsername = (req, res, next) => {
   findUsername(username)
     .then((user) => {
       res.status(200).send({ user });
+    })
+    .catch(next);
+};
+
+exports.patchCommentVotes = (req, res, next) => {
+  const { comment_id } = req.params;
+  updateCommentVotes(comment_id, req.body)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 };

@@ -4,12 +4,16 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("../app");
 const JSONendpoints = require("../endpoints.json");
+const res = require("express/lib/response");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 const hour = 3600000;
 const timeDate = function (num) {
   return JSON.stringify(new Date(num - hour)).slice(1, -1);
+};
+const timeDateTimeZone = function (num) {
+  return JSON.stringify(new Date(num)).slice(1, -1);
 };
 const timeNow = Date.now();
 
@@ -427,6 +431,78 @@ describe("GET /api/users/:username", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toEqual("user shrelPail not found");
+      });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  const commentUpdateInc = {
+    inc_votes: 101,
+  };
+  const commentUpdateDec = {
+    inc_votes: -4,
+  };
+  test("status:200, responds with the updated comment increasing", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send(commentUpdateInc)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment).toEqual({
+          comment_id: 5,
+          body: "I hate streaming noses",
+          votes: 101,
+          author: "icellusedkars",
+          article_id: 1,
+          created_at: timeDateTimeZone(1604437200000),
+        });
+      });
+  });
+
+  test("status:200, responds with the updated comment decreasing", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send(commentUpdateDec)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment).toEqual({
+          comment_id: 5,
+          body: "I hate streaming noses",
+          votes: -4,
+          author: "icellusedkars",
+          article_id: 1,
+          created_at: timeDateTimeZone(1604437200000),
+        });
+      });
+  });
+
+  test("Status:404, responds with error when ID is not found", () => {
+    return request(app)
+      .patch("/api/comments/39482")
+      .send(commentUpdateInc)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("comment 39482 not found");
+      });
+  });
+
+  test("Status:400, responds with error when url is passed bad data type", () => {
+    return request(app)
+      .patch("/api/comments/shrella")
+      .send({ commentUpdateDec })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+
+  test("Status:400, responds with error when trying to pass invalid votes value", () => {
+    return request(app)
+      .patch("/api/comments/4")
+      .send({ inc_votes: "PailShrelington" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Input!");
       });
   });
 });
