@@ -11,12 +11,12 @@ const {
   deleteComment,
 } = require("./controllers/app.controllers");
 
+const app = express();
+app.use(express.json());
+
 app.get("/", (req, res, next) => {
   res.status(200).send({ msg: "Welcome to Shrel News" });
 });
-
-const app = express();
-app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
