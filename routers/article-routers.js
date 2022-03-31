@@ -5,9 +5,10 @@ const {
   getArticles,
   getComments,
   postComment,
+  postArticle,
 } = require("../controllers/app.controllers");
 
-articlesRouter.route("/").get(getArticles);
+articlesRouter.route("/").get(getArticles).post(postArticle);
 articlesRouter
   .route("/:article_id")
   .get(getArticleById)

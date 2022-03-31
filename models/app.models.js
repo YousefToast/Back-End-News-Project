@@ -63,13 +63,27 @@ exports.selectArticleComments = (article_id) => {
     });
 };
 
-exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.selectArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+  p = 1,
+  limit = 10
+) => {
   if (!["created_at", "votes", "author"].includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid Sort Query!" });
   }
   if (!["asc", "desc"].includes(order)) {
     return Promise.reject({ status: 400, msg: "Invalid Order Query!" });
   }
+  if (!(Number(limit) > 0)) {
+    return Promise.reject({ status: 400, msg: "Invalid Limit Query!" });
+  }
+  if (!(Number(p) > 0)) {
+    return Promise.reject({ status: 400, msg: "Invalid Page Query!" });
+  }
+
+  let extraQueryValues = [limit, (p - 1) * limit];
   let queryValues = [];
   let searchStr = "";
   if (topic !== undefined) {
@@ -77,16 +91,47 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
     queryValues.push(topic);
   }
 
-  let queryStr = `SELECT * FROM articles 
+  let queryStr = `SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments
+  ON comments.article_id = articles.article_id
   ${searchStr} 
-  ORDER BY ${sort_by} ${order};`;
+  GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order}
+  LIMIT $${1 + queryValues.length} OFFSET $${2 + queryValues.length};`;
 
-  return db.query(queryStr, queryValues).then((result) => {
-    if (result.rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "topic does not exist" });
+  const articles = db.query(queryStr, [...queryValues, ...extraQueryValues]);
+
+  const numberOfArticles = db.query(
+    `SELECT COUNT(*) AS total_count FROM articles 
+    ${searchStr};
+    `,
+    queryValues
+  );
+  return Promise.all([articles, numberOfArticles]).then(
+    ([articleResult, numberOfArticlesResult]) => {
+      if (articleResult.rows.length === 0 && topic) {
+        return db
+          .query("SELECT * FROM topics WHERE topics.slug = $1", [topic])
+          .then((result) => {
+            if (result.rows.length === 0) {
+              return Promise.reject({
+                status: 404,
+                msg: "topic does not exist",
+              });
+            }
+          });
+      }
+      if (
+        numberOfArticlesResult.rows[0] !== "0" &&
+        articleResult.rows.length === 0
+      ) {
+        return Promise.reject({
+          status: 404,
+          msg: "Page Not Found!",
+        });
+      }
+      return [articleResult.rows, numberOfArticlesResult.rows[0].total_count];
     }
-    return result.rows;
-  });
+  );
 };
 
 exports.createComment = (comment, article_id) => {
@@ -151,6 +196,28 @@ exports.updateCommentVotes = (comment_id, editVotes) => {
           msg: `comment ${comment_id} not found`,
         });
       }
+      return result.rows[0];
+    });
+};
+
+exports.insertArticle = (addArticle) => {
+  const { title, topic, author, body } = addArticle;
+  if (
+    Object.keys(addArticle).length !== 4 ||
+    body === undefined ||
+    title === undefined ||
+    topic === undefined ||
+    author === undefined
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid Body Content!" });
+  }
+  return db
+    .query(
+      "INSERT INTO articles ( author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *;",
+      [author, title, body, topic]
+    )
+    .then((result) => {
+      result.rows[0].comment_count = 0;
       return result.rows[0];
     });
 };

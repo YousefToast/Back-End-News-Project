@@ -9,6 +9,7 @@ const {
   removeComment,
   findUsername,
   updateCommentVotes,
+  insertArticle,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -57,10 +58,10 @@ exports.getComments = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
-  selectArticles(sort_by, order, topic)
+  const { sort_by, order, topic, p, limit } = req.query;
+  selectArticles(sort_by, order, topic, p, limit)
     .then((articles) => {
-      res.status(200).send({ articles });
+      res.status(200).send({ articles: articles[0], total_count: articles[1] });
     })
     .catch(next);
 };
@@ -97,6 +98,14 @@ exports.patchCommentVotes = (req, res, next) => {
   updateCommentVotes(comment_id, req.body)
     .then((comment) => {
       res.status(200).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+  insertArticle(req.body)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };

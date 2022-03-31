@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("../app");
 const JSONendpoints = require("../endpoints.json");
-const res = require("express/lib/response");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -170,7 +169,8 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.articles).toBeInstanceOf(Array);
-        expect(res.body.articles).toHaveLength(12);
+        expect(res.body.articles).toHaveLength(10);
+        expect(res.body.total_count).toBe("12");
         res.body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -183,7 +183,41 @@ describe("GET /api/articles", () => {
               votes: expect.any(Number),
             })
           );
+          expect(typeof Number(article.comment_count)).toBe("number");
         });
+      });
+  });
+
+  test("status:200, set limit = 12 to get all the articles", () => {
+    return request(app)
+      .get("/api/articles?limit=12")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
+      });
+  });
+
+  test("status:200, set limit > 12 will still get all the 12 articles", () => {
+    return request(app)
+      .get("/api/articles?limit=100")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
+      });
+  });
+
+  test("status:200, set limit to 5 so that page 3 has 2 articles", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(2);
       });
   });
 
@@ -258,6 +292,15 @@ describe("GET /api/articles", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid Sort Query!");
+      });
+  });
+
+  test("Status:404, responds with error message when exceeding page limit", () => {
+    return request(app)
+      .get("/api/articles?limit=12&p=5")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Page Not Found!");
       });
   });
 
@@ -503,6 +546,61 @@ describe("PATCH /api/comments/:comment_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid Input!");
+      });
+  });
+});
+
+describe("POST /api/articles", () => {
+  const newArticle = {
+    title: "Shrel takes over the world.",
+    topic: "mitch",
+    author: "icellusedkars",
+    body: "At long last.",
+  };
+  test("status:201, responds with the new article added to the database", () => {
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then((res) => {
+        expect(Date.parse(res.body.article.created_at)).toBeGreaterThan(
+          timeNow
+        );
+        delete res.body.article.created_at;
+        expect(res.body.article).toEqual({
+          title: "Shrel takes over the world.",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "At long last.",
+          votes: 0,
+          article_id: 13,
+          comment_count: 0,
+        });
+      });
+  });
+
+  test("status:400, returns error when there is empty body content", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "icellusedkars",
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Body Content!");
+      });
+  });
+
+  test("status:400, respond with error message when sent invalid body content", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        ...newArticle,
+        votes: 10,
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Body Content!");
       });
   });
 });
