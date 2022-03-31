@@ -20,6 +20,16 @@ $ cd nc-news
 $ code .
 ```
 
+# Tools Required
+
+The list of dependencies used for this project are as follows:
+
+```bash
+Express.js - Server Implementation
+PSQL - Database used for Interactions
+Jest & Supertest - Testing the server
+```
+
 # Installing dependencies
 
 To ensure the right dependencies are added, just enter the following command into the vs code terminal:
