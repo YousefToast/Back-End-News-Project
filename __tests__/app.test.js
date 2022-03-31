@@ -421,7 +421,7 @@ describe("GET /api/users/:username", () => {
       });
   });
 
-  test("Status:404, responds with error when passed a bad username", () => {
+  test("Status:404, responds with error when user does not exist", () => {
     return request(app)
       .get("/api/users/shrelPail")
       .expect(404)

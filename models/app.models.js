@@ -125,7 +125,7 @@ exports.removeComment = (comment_id) => {
 
 exports.findUsername = (username) => {
   return db
-    .query("SELECT * FROM users WHERE username = $1", [username])
+    .query("SELECT * FROM users WHERE username = $1;", [username])
     .then((result) => {
       if (result.rows.length === 0) {
         return Promise.reject({
