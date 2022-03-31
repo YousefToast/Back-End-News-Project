@@ -5,6 +5,10 @@ app.use(express.json());
 
 const apiRouter = require("./routers/api-routers");
 
+app.get("/", (req, res, next) => {
+  res.status(200).send({ msg: "Welcome to Shrel News" });
+});
+
 app.use("/api", apiRouter);
 
 const {
