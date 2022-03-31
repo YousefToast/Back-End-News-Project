@@ -7,6 +7,7 @@ const {
   selectArticles,
   createComment,
   removeComment,
+  findUsername,
 } = require("../models/app.models");
 
 exports.getTopics = (req, res, next) => {
@@ -77,6 +78,15 @@ exports.deleteComment = (req, res, next) => {
   removeComment(comment_id)
     .then((comment) => {
       res.status(204).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.getUserByUsername = (req, res, next) => {
+  const { username } = req.params;
+  findUsername(username)
+    .then((user) => {
+      res.status(200).send({ user });
     })
     .catch(next);
 };
