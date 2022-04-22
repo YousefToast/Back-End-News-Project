@@ -71,7 +71,7 @@ exports.selectArticles = (
   p = 1,
   limit = 10
 ) => {
-  if (!["created_at", "votes", "author"].includes(sort_by)) {
+  if (!["created_at", "votes", "author", "comment_count"].includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid Sort Query!" });
   }
   if (!["asc", "desc"].includes(order)) {
