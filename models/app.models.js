@@ -54,8 +54,9 @@ exports.updateArticleById = (article_id, updatedArticle) => {
 exports.selectArticleComments = (article_id) => {
   return db
     .query(
-      "SELECT comments.comment_id, comments.body, comments.votes, comments.author, comments.created_at FROM comments \
-      WHERE comments.article_id = $1;",
+      `SELECT comments.comment_id, comments.body, comments.votes, comments.author, comments.created_at FROM comments \
+      WHERE comments.article_id = $1
+      ORDER BY comments.created_at ASC;`,
       [article_id]
     )
     .then((result) => {
