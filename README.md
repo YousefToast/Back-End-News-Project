@@ -8,7 +8,7 @@ It has been tested thoroughly to ensure a secure and reliable experience and it 
 
 # Hosting
 
-> > hosting stuff will be added here <<
+This app has been hosted through Heroku. I linked my heroku account to my backend project through my 'connection.js' file and then pushed everything to heroku main once it was ready. Heroku then takes care of displaying all the necessary information and displays it for me in a link created by them.
 
 # Cloning the Repo
 
